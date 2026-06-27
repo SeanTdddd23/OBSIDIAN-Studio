@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>OBSIDIAN | Minimalist Engineering Interface</title>
+  <meta name="description" content="An elite design and engineering studio creating minimalist, ultra-precise interfaces tailored for industry leaders.">
+  <meta name="keywords" content="Design, Architecture, Web Development, Minimalist UI">
+  <meta property="og:title" content="OBSIDIAN | Minimalist Engineering Interface">
+  <meta property="og:description" content="An elite design studio focused purely on typography, content-driven layouts, and fluid motion mechanics.">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <style>
+    /* ==========================================
+       DESIGN SYSTEM VARIABLES (#232323 & #FFFAFA)
+       ========================================== */
+    :root[data-theme="dark"] {
+      --bg-main: #0c0c0e;
+      --bg-card: #16161a;
+      --bg-nav: rgba(12, 12, 14, 0.75);
+      --text-main: #FFFAFA; 
+      --text-muted: #8a8a93;
+      --border: rgba(255, 250, 250, 0.08);
+      --accent: #FFFAFA; 
+      --accent-glow: rgba(255, 250, 250, 0.15);
+      --nav-glow: rgba(255, 250, 250, 0.04);
+      --btn-bg: #FFFAFA;
+      --btn-text: #232323; 
+      --particle-color: rgba(255, 250, 250, 0.25);
+    }
+
+    :root[data-theme="light"] {
+      --bg-main: #f5f5f7;
+      --bg-card: #ffffff;
+      --bg-nav: rgba(245, 245, 247, 0.75);
+      --text-main: #232323; 
+      --text-muted: #6e6e73;
+      --border: rgba(35, 35, 35, 0.08);
+      --accent: #232323;
+      --accent-glow: rgba(35, 35, 35, 0.1);
+      --nav-glow: rgba(35, 35, 35, 0.03);
+      --btn-bg: #232323;
+      --btn-text: #FFFAFA;
+      --particle-color: rgba(35, 35, 35, 0.2);
+    }
+
+    /* GLOBAL RESET & CORE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.4s ease, border-color 0.4s ease;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* PREMIUM PAGE LOADER */
+    .loader-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: var(--bg-main);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+    }
+
+    .loader-line {
+      width: 160px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      background-size: 200% 100%;
+      animation: loadCommence 1.2s infinite linear;
+    }
+
+    @keyframes loadCommence {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .loader-hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* CUSTOM RIGHT-CLICK CONTEXT MENU */
+    .custom-context-menu {
+      position: fixed;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0;
+      min-width: 160px;
+      z-index: 10000;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .context-menu-item {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .context-menu-item:hover {
+      background: var(--nav-glow);
+    }
+
+    /* PREMIUM NAVIGATION BAR */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 1.25rem 2rem;
+      background: var(--bg-nav);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .nav-logo {
+      color: var(--text-main);
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .logo-dot {
+      color: var(--accent);
+    }
+
+    .nav-menu-wrapper {
+      position: relative;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.6rem 1.3rem;
+      position: relative;
+      z-index: 2;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link.active, .nav-link:hover {
+      color: var(--text-main);
+    }
+
+    .nav-hover-backdrop {
+      position: absolute;
+      background: var(--nav-glow);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 1;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .btn-nav {
+      display: inline-block;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.7rem 1.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .btn-nav:hover, .btn-primary {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border-color: var(--btn-bg);
+    }
+
+    .btn-primary {
+      display: inline-block;
+      color: var(--btn-text);
+      background: var(--btn-bg);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 1rem 2.2rem;
+      border-radius: 4px;
+      border: 1px solid var(--btn-bg);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 22px;
+      height: 16px;
+      background: transparent;
+      border: none;
+    }
+
+    .mobile-menu-toggle .bar {
+      width: 100%;
+      height: 2px;
+      background-color: var(--text-main);
+      transition: all 0.3s ease;
+    }
+
+    /* SECTIONS CONTENT LAYOUT */
+    .section-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8rem 2rem 5rem 2rem;
+      max-width: 1300px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .animate-element {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .animate-element.reveal-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-tag {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: var(--text-main);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+
+    h1 {
+      font-size: 4.5rem;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      max-width: 650px;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    /* SHOWCASE CARD GRID */
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2.5rem;
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    .grid-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      height: 450px;
+      cursor: pointer;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s;
+    }
+
+    .grid-item:hover {
+      transform: translateY(-10px);
+      border-color: var(--accent);
+    }
+
+    .card-img-wrapper {
+      width: 100%;
+      height: 60%;
+      overflow: hidden;
+      background: #111;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      filter: grayscale(100%);
+      transition: opacity 1s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s;
+    }
+
+    .grid-item:hover .card-img {
+      transform: scale(1.05);
+      filter: grayscale(0%);
+    }
+
+    .image-loaded {
+      opacity: 1;
+    }
+
+    .card-body {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 40%;
+    }
+
+    .card-body h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-body p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* MINIMALIST SKILL MATRIX */
+    .matrix-container {
+      width: 100%;
+      margin-top: 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .matrix-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      border-radius: 6px;
+      text-align: left;
+    }
+
+    .matrix-box h4 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+    }
+
+    .matrix-bar-wrap {
+      background: var(--bg-main);
+      height: 2px;
+      width: 100%;
+      position: relative;
+      margin-top: 1.5rem;
+    }
+
+    .matrix-bar {
+      background: var(--accent);
+      height: 100%;
+      width: 0;
+      transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ABOUT SECTION & DYNAMIC COUNTER */
+    .about-wrapper {
+      display: flex;
+      gap: 4rem;
+      align-items: center;
+      text-align: left;
+      width: 100%;
+      margin-top: 2rem;
+    }
+
+    .about-info { flex: 1; }
+    .about-info h2 { margin-bottom: 1.5rem; }
+    .about-info p { text-align: left; margin-bottom: 1.5rem; color: var(--text-muted); line-height: 1.7;}
+    
+    .about-stats {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    /* TESTIMONIAL CAROUSEL */
+    .carousel-container {
+      width: 100%;
+      max-width: 800px;
+      position: relative;
+      margin-top: 2rem;
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .testimonial-card {
+      min-width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 3rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .testimonial-text {
+      font-size: 1.3rem;
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 1.5rem;
+    }
+
+    .testimonial-author {
+      font-weight: 600;
+      color: var(--text-main);
+      opacity: 0.8;
+      font-size: 1rem;
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      width: 20px;
+      border-radius: 4px;
+    }
+
+    /* CONTACT FORM & STATUS INDICATORS */
+    .contact-wrapper {
+      width: 100%;
+      max-width: 700px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 3.5rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+      text-align: left;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group input, .form-group textarea {
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      padding: 1rem 1.2rem;
+      color: var(--text-main);
+      font-size: 1rem;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .contact-form .btn-primary {
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    /* CASE STUDY OVERLAY (MODAL) */
+    .project-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(12, 12, 14, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 99999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+    }
+
+    .project-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .overlay-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 4rem;
+      max-width: 650px;
+      width: 90%;
+      border-radius: 8px;
+      position: relative;
+      text-align: left;
+      transform: translateY(30px);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .project-overlay.active .overlay-content {
+      transform: translateY(0);
+    }
+
+    .close-overlay {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 1.5rem;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    .close-overlay:hover { opacity: 1; }
+
+    .overlay-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .overlay-desc {
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    /* Back To Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    /* Footer Structure */
+    .footer {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      padding: 4rem 2rem;
+      margin-top: 5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .footer-brand h3 {
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand p {
+      color: var(--text-muted);
+      max-width: 300px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .footer-links h4 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1.2rem;
+      color: var(--text-main);
+    }
+
+    .footer-links ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-main);
+    }
+
+    .footer-links svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .footer-bottom {
+      max-width: 1300px;
+      margin: 4rem auto 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle { display: flex; }
+      .nav-hover-backdrop { display: none; }
+      h1 { font-size: 3rem; }
+      h2 { font-size: 2.2rem; }
+
+      .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        height: 100vh;
+        background: var(--bg-card);
+        flex-direction: column;
+        justify-content: center;
+        gap: 2rem;
+        transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        border-left: 1px solid var(--border);
+      }
+
+      .nav-menu.active { right: 0; }
+      .nav-actions { display: none; }
+      
+      .about-wrapper { flex-direction: column; gap: 2.5rem; }
+      .contact-wrapper { padding: 2rem; }
+      .footer-container { grid-template-columns: 1fr; gap: 2rem; }
+      .overlay-content { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="particleCanvas"></canvas>
+
+  <div class="loader-container" id="pageLoader">
+    <div class="loader-line"></div>
+  </div>
+
+  <div class="custom-context-menu" id="contextMenu">
+    <div class="context-menu-item" onclick="window.scrollTo({top:0, behavior:'smooth'});">Back To Top <span>↑</span></div>
+    <div class="context-menu-item" onclick="document.getElementById('themeToggle').click();">Switch Theme <span>◑</span></div>
+  </div>
+
+  <div class="project-overlay" id="projectOverlay">
+    <div class="overlay-content">
+      <button class="close-overlay" id="closeOverlay">✕</button>
+      <div class="overlay-title" id="modalTitle">Project Title</div>
+      <div class="overlay-desc" id="modalDesc">Project description...</div>
+      <a href="#contact" class="btn-primary" onclick="document.getElementById('closeOverlay').click();">Inquire Architecture</a>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#home" class="nav-logo">OBSIDIAN<span class="logo-dot">.</span></a>
+      <div class="nav-menu-wrapper">
+        <div class="nav-hover-backdrop" id="glowBackdrop"></div>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#showcase" class="nav-link">Showcase</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+          <svg id="themeIcon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+        <div class="nav-actions">
+          <a href="#contact" class="btn-nav">Get Started</a>
+        </div>
+        <button class="mobile-menu-toggle" id="mobileToggle" aria-label="Toggle navigation">
+          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <section id="home" class="section-container">
+    <span class="section-tag animate-element">Digital Experience Agency</span>
+    <h1 class="animate-element">We craft minimalist<br>digital ecosystems.</h1>
+    <p class="animate-element section-desc">An elite design and engineering studio creating clean, ultra-precise interfaces tailored for tomorrow's industry leaders.</p>
+    <div class="animate-element">
+      <a href="#showcase" class="btn-primary">Explore Work</a>
+    </div>
+  </section>
+
+  <section id="showcase" class="section-container">
+    <span class="section-tag animate-element">Selected Portfolios</span>
+    <h2 class="animate-element">Our Case Studies</h2>
+    <p class="animate-element section-desc">A deep dive into functional structures, aesthetic layouts, and interactive application deployments.</p>
+    
+    <div class="showcase-grid animate-element">
+      <div class="grid-item" onclick="openCaseStudy('Project Avant-Garde', 'A full-scale E-Commerce structural ecosystem engineered for extreme performance. Built with fluid transitions and modular architecture.')">
+        <div class="card-img-wrapper">
+          <img class="card-img" data-src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="Minimalist Detail">
+        </div>
+        <div class="card-body">
+          <div><h3>Project Avant-Garde</h3><p>E-Commerce Architecture system deployment.</p></div>
+        </div>
+      </div>
+      <div class="grid-item" onclick="openCaseStudy('Vortex Interactive', 'An immersive structural environment using high-end 3D mechanics and WebGL canvas loops optimized to render real-time interactive matrix behaviors.')">
+        <div class="card-img-wrapper">
+          <img class="card-img" data-src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80" alt="Tech Interior">
+        </div>
+        <div class="card-body">
+          <div><h3>Vortex Interactive</h3><p>WebGL real-time immersive engine components.</p></div>
+        </div>
+      </div>
+      <div class="grid-item" onclick="openCaseStudy('Krypton Core', 'An ultra-precise Fintech application matrix layout designed for premium banking operations. Features multiple dashboard systems.')">
+        <div class="card-img-wrapper">
+          <img class="card-img" data-src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80" alt="Modern Skyscraper">
+        </div>
+        <div class="card-body">
+          <div><h3>Krypton Core</h3><p>Fintech dashboard design system architecture.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="matrix-container animate-element">
+      <div class="matrix-box">
+        <h4>UI/UX Minimalist Design</h4>
+        <div class="matrix-bar-wrap"><div class="matrix-bar" data-width="95%"></div></div>
+      </div>
+      <div class="matrix-box">
+        <h4>Database Normalization (1NF-3NF)</h4>
+        <div class="matrix-bar-wrap"><div class="matrix-bar" data-width="90%"></div></div>
+      </div>
+      <div class="matrix-box">
+        <h4>Front-End Engineering</h4>
+        <div class="matrix-bar-wrap"><div class="matrix-bar" data-width="88%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="section-container">
+    <span class="section-tag animate-element">Who We Are</span>
+    <div class="about-wrapper animate-element">
+      <div class="about-info">
+        <h2>Engineered for extreme performance.</h2>
+        <p>We break down complex operational data into beautifully integrated, crystal-clear digital platforms. Our philosophy focuses purely on typography and content-driven motion mechanics.</p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-box">
+          <div class="stat-number count-up" data-target="48">0</div>
+          <p>Global Brands Served</p>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number count-up" data-target="99">0</div>
+          <p>Efficiency Rate (%)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonials" class="section-container">
+    <span class="section-tag animate-element">Client Feedback</span>
+    <h2 class="animate-element">Trusted Globally</h2>
+    <div class="carousel-container animate-element">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"Obsidian delivered structural perfection. Our system interface speeds increased by 40% immediately."</p>
+          <p class="testimonial-author">Alexander Vance — CTO, Krypton Core</p>
+        </div>
+        <div class="testimonial-card">
+          <p class="testimonial-text">"Absolute mastery over minimal geometry. They don't just build pages; they craft smooth digital interactions."</p>
+          <p class="testimonial-author">Helena Ross — Design Director, Avant-Garde</p>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+  </section>
+
+  <section id="contact" class="section-container">
+    <span class="section-tag animate-element">Get In Touch</span>
+    <h2>Let's build something.</h2>
+    <p class="animate-element section-desc">Ready to launch? Reach out with your project details and let's configure an elite workflow together.</p>
+    
+    <div class="contact-wrapper animate-element">
+    <form id="emailForm" class="contact-form">
+    
+    <div class="form-group">
+        <label for="name">Your Name</label>
+        <!-- ⚠️ အရေးကြီး: name ကို "from_name" လို့ပဲ ပေးရပါမယ် -->
+        <input type="text" id="name" name="from_name" placeholder="John Doe" required>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email Address</label>
+        <!-- ⚠️ အရေးကြီး: name ကို "reply_to" လို့ပဲ ပေးရပါမယ် -->
+        <input type="email" id="email" name="reply_to" placeholder="john@example.com" required>
+    </div>
+
+    <div class="form-group">
+        <label for="message">Project Description</label>
+        <!-- ⚠️ name ကို "message" လို့ ထားပါ (ဒါကြောင့် ဒါပဲ ပေါ်နေတာပါ) -->
+        <textarea id="message" name="message" rows="5" placeholder="Tell us about your venture..." required></textarea>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn-primary">Send Message</button>
+    </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <h3>OBSIDIAN<span class="logo-dot">.</span></h3>
+        <p>Architecting premium web interactions with structural design precision.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#showcase">Showcase</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 OBSIDIAN Inc. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+  <script>
+    // --- Initialize EmailJS SDK ---
+    // ⚠️ ဘယ်မှ မလွှင့်ရသေးခင် စမ်းသပ်ဖို့ အောက်က "YOUR_PUBLIC_KEY" နေရာမှာ ကိုယ့် Key ထည့်ပါ
+    (function() {
+        emailjs.init("rSAEUAkcNxD60FW70"); 
+    })();
+
+    // --- Dynamic Particle Background ---
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particlesArray = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 1.5 + 0.5;
+        this.speedX = Math.random() * 0.3 - 0.15;
+        this.speedY = Math.random() * 0.3 - 0.15;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+      }
+      draw() {
+        const color = getComputedStyle(document.documentElement).getPropertyValue('--particle-color');
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particlesArray = [];
+      const numberOfParticles = Math.floor((canvas.width * canvas.height) / 9000);
+      for (let i = 0; i < numberOfParticles; i++) {
+        particlesArray.push(new Particle());
+      }
+    }
+    initParticles();
+    window.addEventListener('resize', initParticles);
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particlesArray.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // --- Active Contact Transmission Block ---
+    document.getElementById('emailForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.innerText;
+      submitBtn.innerText = "TRANSMITTING...";
+      submitBtn.style.opacity = "0.5";
+
+      // ⚠️ နေရာမှာ ကိုယ့် Service ID နဲ့ Template ID အစားထိုးပါ
+      const serviceID = 'service_gg2em9y';
+      const templateID = 'template_hudf3o7';
+
+      emailjs.sendForm(serviceID, templateID, this)
+        .then(() => {
+          submitBtn.innerText = "SUCCESSFULLY SENT";
+          submitBtn.style.background = "#28a745";
+          submitBtn.style.color = "#fff";
+          alert('System Log: Message sent straight to your Email!');
+          document.getElementById('emailForm').reset();
+          setTimeout(() => {
+            submitBtn.innerText = originalText;
+            submitBtn.style.background = "var(--btn-bg)";
+            submitBtn.style.color = "var(--btn-text)";
+            submitBtn.style.opacity = "1";
+          }, 4000);
+        }, (err) => {
+          submitBtn.innerText = "FAILED";
+          alert(JSON.stringify(err));
+          submitBtn.innerText = originalText;
+          submitBtn.style.opacity = "1";
+        });
+    });
+
+    // --- Case Study Overlay ---
+    const overlay = document.getElementById('projectOverlay');
+    function openCaseStudy(title, desc) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalDesc').innerText = desc;
+      overlay.classList.add('active');
+    }
+    document.getElementById('closeOverlay').addEventListener('click', () => {
+      overlay.classList.remove('active');
+    });
+
+    // --- Page Loader & Lazy Images ---
+    window.addEventListener('load', () => {
+      document.getElementById('pageLoader').classList.add('loader-hidden');
+      document.querySelectorAll('.card-img').forEach(img => {
+        img.src = img.getAttribute('data-src');
+        img.onload = () => img.classList.add('image-loaded');
+      });
+    });
+
+    // --- Navigation Mobile Drawer ---
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navMenu = document.getElementById('navMenu');
+    mobileToggle.addEventListener('click', () => {
+      mobileToggle.classList.toggle('active');
+      navMenu.classList.toggle('active');
+    });
+
+    // --- Theme Control Mechanics ---
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const htmlElement = document.documentElement;
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = htmlElement.getAttribute('data-theme');
+      if (currentTheme === 'dark') {
+        htmlElement.setAttribute('data-theme', 'light');
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>';
+      } else {
+        htmlElement.setAttribute('data-theme', 'dark');
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      }
+    });
+
+    // --- Nav Hover Track Mechanics ---
+    const navLinks = document.querySelectorAll('.nav-link');
+    const glowBackdrop = document.getElementById('glowBackdrop');
+
+    navLinks.forEach(link => {
+      link.addEventListener('mouseenter', (e) => {
+        const rect = e.target.getBoundingClientRect();
+        const parentRect = e.target.parentElement.parentElement.getBoundingClientRect();
+        glowBackdrop.style.width = `${rect.width}px`;
+        glowBackdrop.style.height = `${rect.height}px`;
+        glowBackdrop.style.left = `${rect.left - parentRect.left}px`;
+        glowBackdrop.style.top = `${rect.top - parentRect.top}px`;
+        glowBackdrop.style.opacity = '1';
+      });
+      link.addEventListener('mouseleave', () => glowBackdrop.style.opacity = '0');
+      link.addEventListener('click', () => {
+        mobileToggle.classList.remove('active');
+        navMenu.classList.remove('active');
+      });
+    });
+
+    // --- Context Menu Trigger ---
+    const contextMenu = document.getElementById('contextMenu');
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      contextMenu.style.top = `${e.clientY}px`;
+      contextMenu.style.left = `${e.clientX}px`;
+      contextMenu.style.display = 'block';
+    });
+    document.addEventListener('click', () => contextMenu.style.display = 'none');
+
+    // --- Count Up Stats Loop ---
+    function executeCountUp(element) {
+      const target = +element.getAttribute('data-target');
+      const speed = 40;
+      const increment = target / speed;
+
+      const updateCount = () => {
+        const current = +element.innerText;
+        if (current < target) {
+          element.innerText = Math.ceil(current + increment);
+          setTimeout(updateCount, 25);
+        } else {
+          element.innerText = target + (target === 48 ? "+" : "%");
+        }
+      };
+      updateCount();
+    }
+
+    // --- Review Carousel Mechanism ---
+    const track = document.getElementById('carouselTrack');
+    const cards = document.querySelectorAll('.testimonial-card');
+    const dotsContainer = document.getElementById('carouselDots');
+    let currentIndex = 0;
+
+    cards.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if(idx === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => {
+        currentIndex = idx;
+        track.style.transform = `translateX(-${idx * 100}%)`;
+        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+      });
+      dotsContainer.appendChild(dot);
+    });
+
+    setInterval(() => {
+      let nextIdx = (currentIndex + 1) % cards.length;
+      if (document.querySelectorAll('.dot')[nextIdx]) {
+        document.querySelectorAll('.dot')[nextIdx].click();
+      }
+    }, 6000);
+
+    // --- Scroll Control Core ---
+    const bttBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 800) bttBtn.classList.add('visible');
+      else bttBtn.classList.remove('visible');
+    });
+
+    const sections = document.querySelectorAll('section');
+    const revealElements = document.querySelectorAll('.animate-element');
+
+    const masterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.target.classList.contains('animate-element')) {
+          entry.target.classList.add('reveal-visible');
+        }
+        if (entry.isIntersecting && entry.target.tagName === 'SECTION') {
+          const currentId = entry.target.getAttribute('id');
+          navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${currentId}`) link.classList.add('active');
+          });
+        }
+        if (entry.isIntersecting && entry.target.id === 'showcase') {
+          document.querySelectorAll('.matrix-bar').forEach(bar => {
+            bar.style.width = bar.getAttribute('data-width');
+          });
+        }
+        if (entry.isIntersecting && entry.target.id === 'about') {
+          document.querySelectorAll('.count-up').forEach(num => {
+            if(num.innerText === "0") executeCountUp(num);
+          });
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
+
+    sections.forEach(sec => masterObserver.observe(sec));
+    revealElements.forEach(el => masterObserver.observe(el));
+  </script>
+</body>
+</html>
